@@ -789,6 +789,36 @@ vector<Vec2i> Device::mapDepthToColor( const vector<Vec2i>& v, const Channel16u&
 	return p;
 }
 
+vector<Vec3f> Device::mapColorToCamera(const Channel16u& depth, const Vec2i& colorSize) const
+{
+	vector<Vec3f> p;
+	if (depth) {
+		vector<CameraSpacePoint> camera(colorSize.x * colorSize.y);
+		KCBMapColorFrameToCameraSpace(mKinect, camera.size(), depth.getData(), camera.size(), &camera[0]);
+		for_each(camera.begin(), camera.end(), [&p](const CameraSpacePoint& i)
+		{
+			p.push_back(toVec3f(i));
+		});
+	}
+	return p;
+}
+
+vector<Vec2f> Device::mapColorToDepth(const Channel16u& depth, const Vec2i& colorSize) const
+{
+	vector<Vec2f> p;
+	if (depth) {
+		int cSize = colorSize.x * colorSize.y;
+		int dSize = depth.getWidth()*depth.getHeight();
+		vector<DepthSpacePoint> depthPoints(cSize);
+		KCBMapColorFrameToDepthSpace(mKinect, dSize, depth.getData(), cSize, &depthPoints[0]);
+		for_each(depthPoints.begin(), depthPoints.end(), [&p](const DepthSpacePoint& i)
+		{
+			p.push_back(toVec2f(i));
+		});
+	}
+	return p;
+}
+
 void Device::start()
 {
 	long hr = S_OK;
