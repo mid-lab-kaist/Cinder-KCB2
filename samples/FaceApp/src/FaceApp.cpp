@@ -53,10 +53,11 @@ public:
 	void							setup();
 	void							update();
 private:
-	std::vector<Kinect2::Body>		mBodies;
 	Kinect2::DeviceRef				mDevice;
 	bool							mEnabledFace2d;
 	bool							mEnabledFace3d;
+	std::vector<Kinect2::Face2d>	mFaces2d;
+	std::vector<Kinect2::Face3d>	mFaces3d;
 	ci::Surface8u					mSurface;
 
 	float							mFrameRate;
@@ -83,42 +84,36 @@ void FaceApp::draw()
 		gl::disable( GL_TEXTURE_2D );
 		gl::pushMatrices();
 		gl::scale( Vec2f( getWindowSize() ) / Vec2f( mSurface.getSize() ) );
-		for ( const Kinect2::Body& body : mBodies ) {
-			if ( body.isTracked() ) {
-
-				gl::color( Colorf::white() );
-				const Kinect2::Body::Face3d& face3d = body.getFace3d();
-				if ( face3d.isTracked() ) {
-
-					const TriMesh& mesh = face3d.getMesh();
-					if ( mesh.getNumIndices() > 0 ) {
-						vector<Vec2f> verts;
-						for ( const Vec3f& i : mesh.getVertices() ) {
-							Vec2f v = mDevice->mapCameraToColor( i );
-							verts.push_back( v );
-						}
-
-						gl::lineWidth( 0.5f );
-						gl::enableWireframe();
-						TriMesh2d mesh2d;
-						mesh2d.appendIndices( &mesh.getIndices()[ 0 ], mesh.getNumIndices() );
-						mesh2d.appendVertices( &verts[ 0 ], mesh.getNumVertices() );
-						gl::draw( mesh2d );
-						gl::disableWireframe();
-					}
+		
+		for ( const Kinect2::Face3d& face : mFaces3d ) {
+			const TriMesh& mesh = face.getMesh();
+			if ( mesh.getNumIndices() > 0 ) {
+				vector<Vec2f> verts;
+				for ( const Vec3f& i : mesh.getVertices() ) {
+					Vec2f v = mDevice->mapCameraToColor( i );
+					verts.push_back( v );
 				}
 
-				if ( mEnabledFace3d ) {
-					gl::color( Colorf( 1.0f, 0.0f, 0.0f ) );
-				} else {
-					gl::lineWidth( 2.0f );
-				}
-				const Kinect2::Body::Face2d& face2d = body.getFace2d();
-				if ( face2d.isTracked() ) {
-					gl::drawStrokedRect( face2d.getBoundsColor() );
-					for ( const Vec2f& i : face2d.getPointsColor() ) {
-						gl::drawSolidCircle( i, 3.0f, 16 );
-					}
+				gl::lineWidth( 0.5f );
+				gl::enableWireframe();
+				TriMesh2d mesh2d;
+				mesh2d.appendIndices( &mesh.getIndices()[ 0 ], mesh.getNumIndices() );
+				mesh2d.appendVertices( &verts[ 0 ], mesh.getNumVertices() );
+				gl::draw( mesh2d );
+				gl::disableWireframe();
+			}
+		}
+		
+		if ( mEnabledFace3d ) {
+			gl::color( Colorf( 1.0f, 0.0f, 0.0f ) );
+		} else {
+			gl::lineWidth( 2.0f );
+		}
+		for ( const Kinect2::Face2d& face : mFaces2d ) {
+			if ( face.isTracked() ) {
+				gl::drawStrokedRect( face.getBoundsColor() );
+				for ( const Vec2f& i : face.getPointsColor() ) {
+					gl::drawSolidCircle( i, 3.0f, 16 );
 				}
 			}
 		}
@@ -145,10 +140,7 @@ void FaceApp::setup()
 
 	mDevice = Kinect2::Device::create();
 	mDevice->start();
-	mDevice->connectBodyEventHandler( [ & ]( const Kinect2::BodyFrame& frame )
-	{
-		mBodies = frame.getBodies();
-	} );
+	mDevice->enableFaceMesh();
 	mDevice->connectColorEventHandler( [ & ]( const Kinect2::ColorFrame frame )
 	{
 		mSurface = frame.getSurface();
@@ -166,9 +158,26 @@ void FaceApp::update()
 {
 	mFrameRate = getAverageFps();
 	
-	mDevice->enableFaceTracking2d( mEnabledFace2d );
-	mDevice->enableFaceTracking3d( mEnabledFace3d );
-	mDevice->enableFaceMesh( mEnabledFace3d );
+	// Toggles streams by connecting and disconnecting events
+	if ( mEnabledFace2d && !mDevice->isFace2dEventHandlerConnected() ) {
+		mDevice->connectFace2dEventHandler( [ & ]( const Kinect2::Face2dFrame& frame )
+		{
+			mFaces2d = frame.getFaces();
+		} );
+	} else if ( !mEnabledFace2d && mDevice->isFace2dEventHandlerConnected() ) {
+		mDevice->disconnectFace2dEventHandler();
+		mFaces2d.clear();
+	}
+
+	if ( mEnabledFace3d && !mDevice->isFace3dEventHandlerConnected() ) {
+		mDevice->connectFace3dEventHandler( [ & ]( const Kinect2::Face3dFrame& frame )
+		{
+			mFaces3d = frame.getFaces();
+		} );
+	} else if ( !mEnabledFace3d && mDevice->isFace3dEventHandlerConnected() ) {
+		mDevice->disconnectFace3dEventHandler();
+		mFaces3d.clear();
+	}
 
 	if ( mFullScreen != isFullScreen() ) {
 		setFullScreen( mFullScreen );
