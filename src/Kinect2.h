@@ -60,6 +60,7 @@
 namespace Kinect2 {
 
 class Device;
+<<<<<<< HEAD
 
 ci::Channel8u											channel16To8( const ci::Channel16u& channel, uint8_t bytes = 4 );
 ci::Surface8u											colorizeBodyIndex( const ci::Channel8u& bodyIndexChannel );
@@ -97,16 +98,117 @@ public:
 	{
 	public:
 		IFace();
+=======
+
+ci::Channel8u											channel16To8( const ci::Channel16u& channel, uint8_t bytes = 4 );
+ci::Surface8u											colorizeBodyIndex( const ci::Channel8u& bodyIndexChannel );
+
+ci::Color8u												getBodyColor( size_t index );
+size_t													getDeviceCount();
+std::map<size_t, std::string>							getDeviceMap();
+
+CameraSpacePoint										toCameraSpacePoint( const ci::Vec3f& v );
+ColorSpacePoint											toColorSpacePoint( const ci::Vec2f& v );
+DepthSpacePoint											toDepthSpacePoint( const ci::Vec2f& v );
+PointF													toPointF( const ci::Vec2f& v );
+Vector4													toVector4( const ci::Quatf& q );
+Vector4													toVector4( const ci::Vec4f& v );
+
+ci::Quatf												toQuatf( const Vector4& v );
+ci::Rectf												toRectf( const RectI& v );
+ci::Vec2f												toVec2f( const PointF& v );
+ci::Vec2f												toVec2f( const ColorSpacePoint& v );
+ci::Vec2f												toVec2f( const DepthSpacePoint& v );
+ci::Vec3f												toVec3f( const CameraSpacePoint& v );
+ci::Vec4f												toVec4f( const Vector4& v );
+
+std::string												wcharToString( wchar_t* v );
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 
 		bool											isTracked() const;
 	protected:
 		bool											mTracked;
 
+<<<<<<< HEAD
 		friend class									Device;
 	};
+=======
+class IFace
+{
+public:
+	IFace();
+
+	uint64_t										getId() const;
+	uint8_t											getIndex() const;
+	bool											isTracked() const;
+protected:
+	uint64_t										mId;
+	uint8_t											mIndex;
+	bool											mTracked;
+
+	friend class									Device;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+class Face2d : public IFace
+{
+public:
+	Face2d();
+
+	const ci::Rectf&								getBoundsColor() const;
+	const ci::Rectf&								getBoundsInfrared() const;
+	const std::map<FaceProperty, DetectionResult>&	getFaceProperties() const;
+	const std::vector<ci::Vec2f>&					getPointsColor() const;
+	const std::vector<ci::Vec2f>&					getPointsInfrared() const;
+	const ci::Quatf&								getRotation() const;
+protected:
+	ci::Rectf										mBoundsColor;
+	ci::Rectf										mBoundsInfrared;
+	std::map<FaceProperty, DetectionResult>			mFaceProperties;
+	std::vector<ci::Vec2f>							mPointsColor;
+	std::vector<ci::Vec2f>							mPointsInfrared;
+	ci::Quatf										mRotation;
+
+	friend class									Device;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+class Face3d : public IFace
+{
+public:
+	Face3d();
+
+	const ci::Rectf&								getBounds() const;
+	FaceAlignmentQuality							getFaceAlignmentQuality() const;
+	const std::map<FaceShapeAnimations, float>&		getFaceShapeAnimations() const;
+	const std::map<FaceShapeDeformations, float>&	getFaceShapeDeformations() const;
+	const ci::ColorA8u&								getHairColor() const;
+	const ci::Vec3f&								getHeadPivotPoint() const;
+	const ci::TriMesh&								getMesh() const;
+	const ci::Quatf&								getOrientation() const;
+	float											getScale() const;
+	const ci::ColorA8u&								getSkinColor() const;
+protected:
+	ci::Rectf										mBounds;
+	ci::ColorA8u									mColorHair;
+	ci::ColorA8u									mColorSkin;
+	FaceAlignmentQuality							mFaceAlignmentQuality;
+	std::map<FaceShapeAnimations, float>			mFaceShapeAnimations;
+	std::map<FaceShapeDeformations, float>			mFaceShapeDeformations;
+	ci::Vec3f										mHeadPivotPoint;
+	ci::TriMesh										mMesh;
+	ci::Quatf										mOrientation;
+	float											mScale;
+
+	friend class									Device;
+};
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< HEAD
 	class Face2d : public IFace
 	{
 	public:
@@ -167,6 +269,27 @@ public:
 	{
 	public:
 		Hand();
+=======
+class Body
+{
+public:
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
+
+		TrackingConfidence								getConfidence() const;
+		HandState										getState() const;
+	protected:
+		TrackingConfidence								mConfidence;
+		HandState										mState;
+
+		friend class									Device;
+	};
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////
+
+	class Hand
+	{
+	public:
+		Hand();
 
 		TrackingConfidence								getConfidence() const;
 		HandState										getState() const;
@@ -210,8 +333,11 @@ public:
 	const std::map<Activity, DetectionResult>&			getActivities() const;
 	const std::map<Appearance, DetectionResult>&		getAppearances() const;
 	const std::map<Expression, DetectionResult>&		getExpressions() const;
+<<<<<<< HEAD
 	const Face2d&										getFace2d() const;
 	const Face3d&										getFace3d() const;
+=======
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	const Hand&											getHandLeft() const;
 	const Hand&											getHandRight() const;
 	uint64_t											getId() const;
@@ -227,8 +353,11 @@ protected:
 	std::map<Appearance, DetectionResult>				mAppearances;
 	DetectionResult										mEngaged;
 	std::map<Expression, DetectionResult>				mExpressions;
+<<<<<<< HEAD
 	Face2d												mFace2d;
 	Face3d												mFace3d;
+=======
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	Hand												mHands[ 2 ];
 	uint64_t											mId;
 	uint8_t												mIndex;
@@ -288,6 +417,7 @@ public:
 	uint8_t*											getBuffer() const;
 	unsigned long										getBufferSize() const;
 	WAVEFORMATEX										getFormat() const;
+<<<<<<< HEAD
 protected:
 	float												mBeamAngle;
 	float												mBeamAngleConfidence;
@@ -295,6 +425,29 @@ protected:
 	unsigned long										mBufferSize;
 	WAVEFORMATEX										mFormat;
 	
+=======
+protected:
+	float												mBeamAngle;
+	float												mBeamAngleConfidence;
+	uint8_t*											mBuffer;
+	unsigned long										mBufferSize;
+	WAVEFORMATEX										mFormat;
+	
+	friend class										Device;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+class BodyFrame : public Frame
+{
+public:
+	BodyFrame();
+
+	const std::vector<Body>&							getBodies() const;
+protected:
+	std::vector<Body>									mBodies;
+
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	friend class										Device;
 };
 
@@ -347,14 +500,34 @@ typedef ChannelFrame16u									InfraredFrame;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-class BodyFrame : public Frame
+class Face2dFrame : public Frame
 {
 public:
-	BodyFrame();
+	Face2dFrame();
 
+<<<<<<< HEAD
 	const std::vector<Body>&							getBodies() const;
 protected:
 	std::vector<Body>									mBodies;
+=======
+	const std::vector<Face2d>&							getFaces() const;
+protected:
+	std::vector<Face2d>									mFaces;
+
+	friend class										Device;
+};
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+class Face3dFrame : public Frame
+{
+public:
+	Face3dFrame();
+
+	const std::vector<Face3d>&							getFaces() const;
+protected:
+	std::vector<Face3d>									mFaces;
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 
 	friend class										Device;
 };
@@ -396,12 +569,19 @@ public:
 	void												start();
 	void												stop();
 
+<<<<<<< HEAD
 	void												enableFaceTracking2d( bool enable = true );
 	void												enableFaceTracking3d( bool enable = true );
 	void												enableHandTracking( bool enable = true );
 	void												enableJointTracking( bool enable = true );
 	bool												isFaceTrackingEnabled2d() const;
 	bool												isFaceTrackingEnabled3d() const;
+=======
+	void												enableFaceMesh( bool enable = true );
+	void												enableHandTracking( bool enable = true );
+	void												enableJointTracking( bool enable = true );
+	bool												isFaceMeshEnabled() const;
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	bool												isHandTrackingEnabled() const;
 	bool												isJointTrackingEnabled() const;
 
@@ -436,6 +616,21 @@ public:
 	}
 
 	template<typename T, typename Y>
+<<<<<<< HEAD
+=======
+	inline void											connectFace2dEventHandler( T eventHandler, Y* obj )
+	{
+		connectFace2dEventHandler( std::bind( eventHandler, obj, std::placeholders::_1 ) );
+	}
+
+	template<typename T, typename Y>
+	inline void											connectFace3dEventHandler( T eventHandler, Y* obj )
+	{
+		connectFace3dEventHandler( std::bind( eventHandler, obj, std::placeholders::_1 ) );
+	}
+
+	template<typename T, typename Y>
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	inline void											connectInfraredEventHandler( T eventHandler, Y* obj )
 	{
 		connectInfraredEventHandler( std::bind( eventHandler, obj, std::placeholders::_1 ) );
@@ -452,6 +647,11 @@ public:
 	void												connectBodyIndexEventHandler( const std::function<void ( const BodyIndexFrame& )>& eventHandler );
 	void												connectColorEventHandler( const std::function<void ( const ColorFrame& )>& eventHandler );
 	void												connectDepthEventHandler( const std::function<void ( const DepthFrame& )>& eventHandler );
+<<<<<<< HEAD
+=======
+	void												connectFace2dEventHandler( const std::function<void ( const Face2dFrame& )>& eventHandler );
+	void												connectFace3dEventHandler( const std::function<void ( const Face3dFrame& )>& eventHandler );
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	void												connectInfraredEventHandler( const std::function<void ( const InfraredFrame& )>& eventHandler );
 	void												connectInfraredLongExposureEventHandler( const std::function<void ( const InfraredFrame& )>& eventHandler );
 
@@ -460,9 +660,27 @@ public:
 	void												disconnectBodyIndexEventHandler();
 	void												disconnectColorEventHandler();
 	void												disconnectDepthEventHandler();
+<<<<<<< HEAD
 	void												disconnectInfraredEventHandler();
 	void												disconnectInfraredLongExposureEventHandler();
 
+=======
+	void												disconnectFace2dEventHandler();
+	void												disconnectFace3dEventHandler();
+	void												disconnectInfraredEventHandler();
+	void												disconnectInfraredLongExposureEventHandler();
+
+	bool												isAudioEventHandlerConnected() const;
+	bool												isBodyEventHandlerConnected() const;
+	bool												isBodyIndexEventHandlerConnected() const;
+	bool												isColorEventHandlerConnected() const;
+	bool												isDepthEventHandlerConnected() const;
+	bool												isFace2dEventHandlerConnected() const;
+	bool												isFace3dEventHandlerConnected() const;
+	bool												isInfraredEventHandlerConnected() const;
+	bool												isInfraredLongExposureEventHandlerConnected() const;
+
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	ci::Vec2i											mapCameraToColor( const ci::Vec3f& v ) const;
 	std::vector<ci::Vec2i>								mapCameraToColor( const std::vector<ci::Vec3f>& v ) const;
 	ci::Vec2i											mapCameraToDepth( const ci::Vec3f& v ) const;
@@ -471,7 +689,10 @@ public:
 	std::vector<ci::Vec3f>								mapDepthToCamera( const std::vector<ci::Vec2i>& v, const ci::Channel16u& depth ) const;
 	std::vector<ci::Vec3f>								mapDepthToCamera( const ci::Channel16u& depth ) const;
 	ci::Surface32f										mapDepthToCameraTable() const;
+<<<<<<< HEAD
 
+=======
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	ci::Vec2i											mapDepthToColor( const ci::Vec2i& v, const ci::Channel16u& depth ) const;
 	std::vector<ci::Vec2i>								mapDepthToColor( const std::vector<ci::Vec2i>& v, const ci::Channel16u& depth ) const;
 	std::vector<ci::Vec2i>								mapDepthToColor( const ci::Channel16u& depth ) const;
@@ -483,6 +704,11 @@ protected:
 		FrameType_BodyIndex, 
 		FrameType_Color, 
 		FrameType_Depth, 
+<<<<<<< HEAD
+=======
+		FrameType_Face2d, 
+		FrameType_Face3d, 
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 		FrameType_Infrared, 
 		FrameType_InfraredLongExposure
 	} typedef FrameType;
@@ -491,6 +717,10 @@ protected:
 
 	virtual void										update();
 
+<<<<<<< HEAD
+=======
+	uint8_t												isSensorOpen() const;
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	KCBHANDLE											mKinect;
 	IKinectSensor*										mSensor;
 
@@ -501,6 +731,11 @@ protected:
 	std::function<void ( const BodyIndexFrame& )>		mEventHandlerBodyIndex;
 	std::function<void ( const ColorFrame& )>			mEventHandlerColor;
 	std::function<void ( const DepthFrame& )>			mEventHandlerDepth;
+<<<<<<< HEAD
+=======
+	std::function<void ( const Face2dFrame& )>			mEventHandlerFace2d;
+	std::function<void ( const Face3dFrame& )>			mEventHandlerFace3d;
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	std::function<void ( const InfraredFrame& )>		mEventHandlerInfrared;
 	std::function<void ( const InfraredFrame& )>		mEventHandlerInfraredLongExposure;
 
@@ -509,15 +744,25 @@ protected:
 	BodyIndexFrame										mFrameBodyIndex;
 	ColorFrame											mFrameColor;
 	DepthFrame											mFrameDepth;
+<<<<<<< HEAD
 	InfraredFrame										mFrameInfrared;
 	InfraredFrame										mFrameInfraredLongExposure;
 
 	bool												mEnabledFaceTracking2d;
 	bool												mEnabledFaceTracking3d;
+=======
+	Face2dFrame											mFrameFace2d;
+	Face3dFrame											mFrameFace3d;
+	InfraredFrame										mFrameInfrared;
+	InfraredFrame										mFrameInfraredLongExposure;
+
+	bool												mEnabledFaceMesh;
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 	bool												mEnabledHandTracking;
 	bool												mEnabledJointTracking;
 
 	static uint32_t										sFaceModelIndexCount;
+<<<<<<< HEAD
 	std::vector<uint32_t>								mFaceModelIndices[ BODY_COUNT ];
 	static uint32_t										sFaceModelVertexCount;
 	std::vector<ci::Vec3f>								mFaceModelVertices[ BODY_COUNT ];
@@ -526,6 +771,33 @@ protected:
 	IFaceFrameSource*									mFaceFrameSource2d[ BODY_COUNT ];
 	IHighDefinitionFaceFrameReader*						mFaceFrameReader3d[ BODY_COUNT ];
 	IHighDefinitionFaceFrameSource*						mFaceFrameSource3d[ BODY_COUNT ];
+=======
+	static uint32_t										sFaceModelVertexCount;
+
+	class FaceData
+	{
+	public:
+		FaceData( IKinectSensor* sensor, float* faceShapeDeformations );
+		~FaceData();
+
+		IFaceAlignment*									mFaceAlignment;
+		IFaceFrameReader*								mFaceFrameReader2d;
+		IHighDefinitionFaceFrameReader*					mFaceFrameReader3d;
+		IFaceFrameSource*								mFaceFrameSource2d;
+		IHighDefinitionFaceFrameSource*					mFaceFrameSource3d;
+		IFaceModel*										mFaceModel;
+		IFaceModelBuilder*								mFaceModelBuilder;
+		bool											mFaceModelProduced;
+		std::vector<uint32_t>							mFaceModelIndices;
+		std::vector<ci::Vec3f>							mFaceModelVertices;
+
+		friend class									Device;
+	};
+	typedef std::shared_ptr<FaceData>					FaceDataRef;
+
+	std::list<FaceDataRef>								mFaceData;
+	float												mFaceShapeDeformations[ FaceShapeDeformations::FaceShapeDeformations_Count ];
+>>>>>>> be09c2fc5d8f411bd1d8983d01c56eed3cde5399
 public:
 
 	//////////////////////////////////////////////////////////////////////////////////////////////
