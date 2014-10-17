@@ -92,8 +92,12 @@ class IFace
 public:
 	IFace();
 
+	uint64_t										getId() const;
+	uint8_t											getIndex() const;
 	bool											isTracked() const;
 protected:
+	uint64_t										mId;
+	uint8_t											mIndex;
 	bool											mTracked;
 
 	friend class									Device;

@@ -282,8 +282,18 @@ string wcharToString( wchar_t* v )
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 IFace::IFace()
-: mTracked( false )
+: mId( 0 ), mIndex( 0 ), mTracked( false )
 {
+}
+
+uint64_t IFace::getId() const
+{
+	return mId;
+}
+
+uint8_t IFace::getIndex() const
+{
+	return mIndex;
 }
 
 bool IFace::isTracked() const
@@ -1518,19 +1528,22 @@ void Device::start()
 						int64_t timeStamp					= 0L;
 						IBody* kinectBodies[ BODY_COUNT ]	= { 0 };
 
-						long hr = KCBGetBodyData( mKinect, BODY_COUNT, kinectBodies, &timeStamp );
+						bool newFaces	= false;
+						long hr			= KCBGetBodyData( mKinect, BODY_COUNT, kinectBodies, &timeStamp );
 						if ( SUCCEEDED( hr ) ) {
 							uint8_t index = 0;
 							for ( FaceDataRef& iter : mFaceData ) {
 								IBody* kinectBody = kinectBodies[ index ];
 								if ( kinectBody != nullptr ) {
 									Face2d face;
+									face.mIndex = index;
 									uint8_t isTracked	= false;
 									hr					= kinectBody->get_IsTracked( &isTracked );
 									if ( SUCCEEDED( hr )								&& 
 										 isTracked										&& 
 										 iter->mFaceFrameSource2d != nullptr	&& 
 										 iter->mFaceFrameReader2d != nullptr ) {
+										kinectBody->get_TrackingId( &face.mId );
 										IFaceFrame* faceFrame	= nullptr;
 										hr						= iter->mFaceFrameReader2d->AcquireLatestFrame( &faceFrame );
 										if ( SUCCEEDED( hr ) && faceFrame != nullptr ) {
@@ -1539,8 +1552,9 @@ void Device::start()
 											if ( SUCCEEDED( hr ) && trackingIdValid != 0 ) {
 												IFaceFrameResult* faceFrameResult	= nullptr;
 												hr									= faceFrame->get_FaceFrameResult( &faceFrameResult );
+												newFaces							= true;
 												if ( SUCCEEDED( hr ) && faceFrameResult != nullptr ) {
-													face.mTracked = true;
+													face.mTracked	= true;
 	
 													RectI faceRectColor = { 0 };
 													hr = faceFrameResult->get_FaceBoundingBoxInColorSpace( &faceRectColor );
@@ -1590,9 +1604,7 @@ void Device::start()
 											faceFrame->Release();
 											faceFrame = nullptr;
 										} else {
-											uint64_t id = 0L;
-											kinectBody->get_TrackingId( &id );
-											iter->mFaceFrameSource2d->put_TrackingId( id );
+											iter->mFaceFrameSource2d->put_TrackingId( face.getId() );
 										}
 									}
 									kinectBody->Release();
@@ -1602,7 +1614,9 @@ void Device::start()
 								}
 								++index;
 							}
-							frame.mTimeStamp = static_cast<long long>( timeStamp );
+							if ( newFaces ) {
+								frame.mTimeStamp = static_cast<long long>( timeStamp );
+							}
 						}
 						if ( frame.getTimeStamp() > mFrameFace2d.getTimeStamp() ) {
 							mFrameFace2d		= frame;
@@ -1626,19 +1640,22 @@ void Device::start()
 						int64_t timeStamp					= 0L;
 						IBody* kinectBodies[ BODY_COUNT ]	= { 0 };
 
-						long hr = KCBGetBodyData( mKinect, BODY_COUNT, kinectBodies, &timeStamp );
+						bool newFaces	= false;
+						long hr			= KCBGetBodyData( mKinect, BODY_COUNT, kinectBodies, &timeStamp );
 						if ( SUCCEEDED( hr ) ) {
 							uint8_t index = 0;
 							for ( FaceDataRef& iter : mFaceData ) {
 								IBody* kinectBody = kinectBodies[ index ];
 								if ( kinectBody != nullptr ) {
 									Face3d face;
+									face.mIndex = index;
 									uint8_t isTracked	= false;
 									hr					= kinectBody->get_IsTracked( &isTracked );
 									if ( SUCCEEDED( hr )						&& 
 										 isTracked								&& 
 										 iter->mFaceFrameSource3d != nullptr	&& 
 										 iter->mFaceFrameReader3d != nullptr ) {
+										kinectBody->get_TrackingId( &face.mId );
 										IHighDefinitionFaceFrame * faceFrame = nullptr;
 										hr = iter->mFaceFrameReader3d->AcquireLatestFrame( &faceFrame );
 										if ( SUCCEEDED( hr ) && faceFrame != nullptr ) {
@@ -1647,7 +1664,8 @@ void Device::start()
 											if ( SUCCEEDED( hr )		&& 
 												 trackingIdValid != 0	&& 
 												 iter->mFaceAlignment != nullptr ) {
-												hr = faceFrame->GetAndRefreshFaceAlignmentResult( iter->mFaceAlignment );
+												hr			= faceFrame->GetAndRefreshFaceAlignmentResult( iter->mFaceAlignment );
+												newFaces	= true;
 												if ( SUCCEEDED( hr ) ) {
 													face.mTracked = true;
 
@@ -1753,7 +1771,9 @@ void Device::start()
 								}
 								++index;
 							}
-							frame.mTimeStamp = static_cast<long long>( timeStamp );
+							if ( newFaces ) {
+								frame.mTimeStamp = static_cast<long long>( timeStamp );
+							}
 						}
 						if ( frame.getTimeStamp() > mFrameFace3d.getTimeStamp() ) {
 							mFrameFace3d		= frame;

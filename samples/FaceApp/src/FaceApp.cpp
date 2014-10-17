@@ -141,6 +141,9 @@ void FaceApp::setup()
 	mDevice = Kinect2::Device::create();
 	mDevice->start();
 	mDevice->enableFaceMesh();
+	mDevice->connectBodyEventHandler( [ & ]( const Kinect2::BodyFrame frame )
+	{
+	} );
 	mDevice->connectColorEventHandler( [ & ]( const Kinect2::ColorFrame frame )
 	{
 		mSurface = frame.getSurface();
@@ -162,7 +165,9 @@ void FaceApp::update()
 	if ( mEnabledFace2d && !mDevice->isFace2dEventHandlerConnected() ) {
 		mDevice->connectFace2dEventHandler( [ & ]( const Kinect2::Face2dFrame& frame )
 		{
-			mFaces2d = frame.getFaces();
+			if ( !frame.getFaces().empty() ) {
+				mFaces2d = frame.getFaces();
+			}
 		} );
 	} else if ( !mEnabledFace2d && mDevice->isFace2dEventHandlerConnected() ) {
 		mDevice->disconnectFace2dEventHandler();
@@ -172,7 +177,9 @@ void FaceApp::update()
 	if ( mEnabledFace3d && !mDevice->isFace3dEventHandlerConnected() ) {
 		mDevice->connectFace3dEventHandler( [ & ]( const Kinect2::Face3dFrame& frame )
 		{
-			mFaces3d = frame.getFaces();
+			if ( !frame.getFaces().empty() ) {
+				mFaces3d = frame.getFaces();
+			}
 		} );
 	} else if ( !mEnabledFace3d && mDevice->isFace3dEventHandlerConnected() ) {
 		mDevice->disconnectFace3dEventHandler();
