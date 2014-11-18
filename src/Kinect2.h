@@ -61,29 +61,29 @@ namespace Kinect2 {
 
 class Device;
 
-ci::Channel8u											channel16To8( const ci::Channel16u& channel, uint8_t bytes = 4 );
-ci::Surface8u											colorizeBodyIndex( const ci::Channel8u& bodyIndexChannel );
+ci::Channel8u										channel16To8( const ci::Channel16u& channel, uint8_t bytes = 4 );
+ci::Surface8u										colorizeBodyIndex( const ci::Channel8u& bodyIndexChannel );
 
-ci::Color8u												getBodyColor( size_t index );
-size_t													getDeviceCount();
-std::map<size_t, std::string>							getDeviceMap();
+ci::Color8u											getBodyColor( size_t index );
+size_t												getDeviceCount();
+std::map<size_t, std::string>						getDeviceMap();
 
-CameraSpacePoint										toCameraSpacePoint( const ci::Vec3f& v );
-ColorSpacePoint											toColorSpacePoint( const ci::Vec2f& v );
-DepthSpacePoint											toDepthSpacePoint( const ci::Vec2f& v );
-PointF													toPointF( const ci::Vec2f& v );
-Vector4													toVector4( const ci::Quatf& q );
-Vector4													toVector4( const ci::Vec4f& v );
+CameraSpacePoint									toCameraSpacePoint( const ci::Vec3f& v );
+ColorSpacePoint										toColorSpacePoint( const ci::Vec2f& v );
+DepthSpacePoint										toDepthSpacePoint( const ci::Vec2f& v );
+PointF												toPointF( const ci::Vec2f& v );
+Vector4												toVector4( const ci::Quatf& q );
+Vector4												toVector4( const ci::Vec4f& v );
 
-ci::Quatf												toQuatf( const Vector4& v );
-ci::Rectf												toRectf( const RectI& v );
-ci::Vec2f												toVec2f( const PointF& v );
-ci::Vec2f												toVec2f( const ColorSpacePoint& v );
-ci::Vec2f												toVec2f( const DepthSpacePoint& v );
-ci::Vec3f												toVec3f( const CameraSpacePoint& v );
-ci::Vec4f												toVec4f( const Vector4& v );
+ci::Quatf											toQuatf( const Vector4& v );
+ci::Rectf											toRectf( const RectI& v );
+ci::Vec2f											toVec2f( const PointF& v );
+ci::Vec2f											toVec2f( const ColorSpacePoint& v );
+ci::Vec2f											toVec2f( const DepthSpacePoint& v );
+ci::Vec3f											toVec3f( const CameraSpacePoint& v );
+ci::Vec4f											toVec4f( const Vector4& v );
 
-std::string												wcharToString( wchar_t* v );
+std::string											wcharToString( wchar_t* v );
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
