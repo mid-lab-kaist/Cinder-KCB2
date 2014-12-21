@@ -1037,7 +1037,15 @@ Vec3f Device::mapDepthToCamera( const Vec2i& v, const Channel16u& depth ) const
 	}
 	return toVec3f( p );
 }
-
+Vec3f Device::mapDepthToCameraFake(const Vec2i& v, const Channel16u& depth) const
+{
+	CameraSpacePoint p;
+	if (depth) {
+		uint16_t d = 1000;
+		KCBMapDepthPointToCameraSpace(mKinect, toDepthSpacePoint(v), d, &p);
+	}
+	return toVec3f(p);
+}
 vector<Vec3f> Device::mapDepthToCamera( const vector<Vec2i>& v, const Channel16u& depth ) const
 {
 	vector<Vec3f> p;
